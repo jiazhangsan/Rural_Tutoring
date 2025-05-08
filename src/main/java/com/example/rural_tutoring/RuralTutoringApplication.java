@@ -8,7 +8,9 @@ public class RuralTutoringApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(RuralTutoringApplication.class, args);
-        System.out.println("Hello Main!");
+        System.out.println(
+                "Hello World!"
+        );
     }
 
 }
