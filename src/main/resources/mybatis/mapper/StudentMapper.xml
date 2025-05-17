@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.rural_tutoring.mapper.StudentMapper">
+
+    <insert id="insert" parameterType="com.example.rural_tutoring.entity.Student">
+        INSERT INTO student (id, name, gender, age, school, grade, contact, parent_contact)
+        VALUES (#{id}, #{name}, #{gender}, #{age}, #{school}, #{grade}, #{contact}, #{parentContact})
+    </insert>
+
+    <update id="update" parameterType="com.example.rural_tutoring.entity.Student">
+        UPDATE student
+        SET name = #{name},
+            gender = #{gender},
+            age = #{age},
+            school = #{school},
+            grade = #{grade},
+            contact = #{contact},
+            parent_contact = #{parentContact}
+        WHERE id = #{id}
+    </update>
+
+</mapper>
