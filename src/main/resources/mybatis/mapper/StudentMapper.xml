@@ -3,9 +3,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.rural_tutoring.mapper.StudentMapper">
 
-    <insert id="insert" parameterType="com.example.rural_tutoring.entity.Student">
-        INSERT INTO student (id, name, gender, age, school, grade, contact, parent_contact)
-        VALUES (#{id}, #{name}, #{gender}, #{age}, #{school}, #{grade}, #{contact}, #{parentContact})
+    <insert id="insert" parameterType="com.example.rural_tutoring.entity.Student" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO student (name, gender, age, school, grade, parent_contact, user_id)
+        VALUES (#{name}, #{gender}, #{age}, #{school}, #{grade}, #{parentContact}, #{userId})
     </insert>
 
     <update id="update" parameterType="com.example.rural_tutoring.entity.Student">
