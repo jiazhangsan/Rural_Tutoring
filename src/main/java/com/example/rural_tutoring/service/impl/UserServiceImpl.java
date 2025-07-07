@@ -4,6 +4,7 @@ import com.example.rural_tutoring.entity.User;
 import com.example.rural_tutoring.mapper.UserMapper;
 import com.example.rural_tutoring.mapper.UserRoleMapper;
 import com.example.rural_tutoring.model.DTO.UserDTO;
+import com.example.rural_tutoring.model.PageResult;
 import com.example.rural_tutoring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -58,5 +59,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllUsers() {
         return userMapper.selectAllUsers();
+    }
+
+    @Override
+    public PageResult<User> getUsersByPage(Integer page, Integer size, String username) {
+        int offset = (page - 1) * size;
+        List<User> users = userMapper.selectUsersByPage(offset, size, username);
+        long total = userMapper.countUsers(username);
+        return new PageResult<>(users, total, page, size);
     }
 }

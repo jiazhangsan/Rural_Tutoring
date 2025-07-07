@@ -19,7 +19,10 @@ public class SecurityConfig {
                  .requestMatchers("/api/students/**").permitAll()  // 公开路径
                  .requestMatchers("/api/user/**").permitAll()
                  .requestMatchers("/api/role/**").permitAll()
+                 .requestMatchers("/api/teacher/**").permitAll()
                  .requestMatchers("/admin/**").hasRole("ADMIN") // 管理员路径
+                 // Swagger UI 相关路径
+                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                  .anyRequest().authenticated()  // 其他路径需登录
          );
      return http.build();

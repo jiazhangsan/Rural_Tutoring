@@ -28,4 +28,25 @@
     <select id="selectAllUsers" resultType="com.example.rural_tutoring.entity.User">
         SELECT * FROM users
     </select>
+
+    <select id="selectUsersByPage" resultType="com.example.rural_tutoring.entity.User">
+        SELECT * FROM user
+        <where>
+            <if test="username != null and username != ''">
+                username LIKE CONCAT('%', #{username}, '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countUsers" resultType="long">
+        SELECT COUNT(*)
+        FROM user
+        <where>
+            <if test="username != null and username != ''">
+                username LIKE CONCAT('%', #{username}, '%')
+            </if>
+        </where>
+    </select>
 </mapper>

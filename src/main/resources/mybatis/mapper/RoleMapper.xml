@@ -9,4 +9,42 @@
         insert into role (role_name)
         values (#{roleName})
     </insert>
+    
+    <!-- 分页查询角色列表 -->
+    <select id="selectRolesByPage" resultType="com.example.rural_tutoring.entity.Role">
+        SELECT id, role_name
+        FROM role
+        <where>
+            <if test="name != null and name != ''">
+                role_name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 查询角色总数 -->
+    <select id="countRoles" resultType="long">
+        SELECT COUNT(*)
+        FROM role
+        <where>
+            <if test="name != null and name != ''">
+                role_name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+    </select>
+    
+    <!-- 更新角色名称 -->
+    <update id="updateRoleName">
+        UPDATE role 
+        SET role_name = #{roleName}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除角色 -->
+    <delete id="deleteRole">
+        DELETE FROM role 
+        WHERE id = #{id}
+    </delete>
+    
 </mapper>

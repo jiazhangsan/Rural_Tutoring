@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/rural_tutoring?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*.xml  # XML 文件路径
+  type-aliases-package: com.example.rural_tutoring.entity  # 实体类包路径
+  configuration:
+    map-underscore-to-camel-case: true      # 开启驼峰命名自动映射
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl  # 日志实现
+
+# Swagger配置 (SpringDoc OpenAPI)
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
