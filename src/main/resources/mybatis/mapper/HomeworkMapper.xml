@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.rural_tutoring.mapper.HomeworkMapper">
+    <resultMap id="BaseResultMap" type="com.example.rural_tutoring.entity.Homework">
+        <id column="id" property="id"/>
+        <result column="lesson_id" property="lessonId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="deadline" property="deadline"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, lesson_id, title, content, deadline, created_by, created_at, status
+    </sql>
+
+    <insert id="insert" parameterType="com.example.rural_tutoring.entity.Homework" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO homework (
+            lesson_id, title, content, deadline, created_by, created_at, status
+        ) VALUES (
+            #{lessonId}, #{title}, #{content}, #{deadline}, #{createdBy}, #{createdAt}, #{status}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT 
+        <include refid="Base_Column_List"/>
+        FROM homework
+        WHERE id = #{id}
+    </select>
+
+    <!-- 保持旧方法兼容 -->
+    <insert id="insertHomework" parameterType="com.example.rural_tutoring.entity.Homework">
+        INSERT INTO homework (
+            lesson_id, title, content, deadline, created_by, created_at, status
+        ) VALUES (
+            #{lessonId}, #{title}, #{content}, #{deadline}, #{createdBy}, #{createdAt}, #{status}
+        )
+    </insert>
+</mapper> 

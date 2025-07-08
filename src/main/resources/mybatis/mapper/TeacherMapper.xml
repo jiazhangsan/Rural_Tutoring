@@ -8,5 +8,8 @@
         INSERT INTO teacher (real_name, university, major, user_id)
         VALUES (#{realName}, #{university}, #{major}, #{user_id})
     </insert>
+    <select id="getTeacherIdByUserId" resultType="java.lang.Integer">
+        select teacher.id from teacher where user_id = #{currentUserId};
+    </select>
 
 </mapper> 

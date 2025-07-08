@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.rural_tutoring.mapper.LessonMapper">
+
+    <insert id="insertLesson" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO lesson (
+            date, start_time, end_time, fee, status, notes, location, max_students, actual_students
+        ) VALUES (
+            #{date}, #{startTime}, #{endTime}, #{fee}, #{status}, #{notes}, #{location}, #{maxStudents}, #{actualStudents}
+        )
+    </insert>
+
+    <insert id="insertTeacherLesson">
+        INSERT INTO teacher_lesson (lesson_id, teacher_id) 
+        VALUES (#{lessonId}, #{teacherId})
+    </insert>
+
+    <select id="selectLessonById" resultType="com.example.rural_tutoring.entity.Lesson">
+        SELECT * FROM lesson WHERE id = #{id}
+    </select>
+
+    <select id="checkStudentJoined" resultType="int">
+        SELECT COUNT(*) FROM lesson_student 
+        WHERE lesson_id = #{lessonId} AND student_id = #{studentId}
+    </select>
+
+    <insert id="insertLessonStudent">
+        INSERT INTO lesson_student (lesson_id, student_id) 
+        VALUES (#{lessonId}, #{studentId})
+    </insert>
+
+    <update id="updateActualStudents">
+        UPDATE lesson 
+        SET actual_students = #{actualStudents}
+        WHERE id = #{id}
+    </update>
+
+</mapper> 

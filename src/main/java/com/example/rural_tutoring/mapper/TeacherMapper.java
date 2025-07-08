@@ -6,4 +6,11 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface TeacherMapper {
     int insertTeacher(Teacher teacher);
-} 
+
+    /**
+     * 根据用户id查询老师id
+     * @param currentUserId
+     * @return
+     */
+    Integer getTeacherIdByUserId(Integer currentUserId);
+}
