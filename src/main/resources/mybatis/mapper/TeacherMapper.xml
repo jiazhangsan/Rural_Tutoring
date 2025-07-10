@@ -8,8 +8,43 @@
         INSERT INTO teacher (real_name, university, major, user_id)
         VALUES (#{realName}, #{university}, #{major}, #{user_id})
     </insert>
+
+    <insert id="insertTeacherSubject">
+        INSERT INTO teacher_subject (subject_id, teacher_id)
+        VALUES (#{subjectId}, #{id})
+    </insert>
     <select id="getTeacherIdByUserId" resultType="java.lang.Integer">
         select teacher.id from teacher where user_id = #{currentUserId};
+    </select>
+    <select id="findTeacherByCondition" resultType="com.example.rural_tutoring.entity.Teacher">
+        SELECT t.*
+        FROM teacher t
+        LEFT JOIN teacher_subject ts ON t.id = ts.teacher_id
+        LEFT JOIN subject s ON ts.subject_id = s.id
+        <where>
+            <if test="realName != null and realName != ''">
+                AND t.real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="subject != null and subject != ''">
+                AND s.subject_name LIKE CONCAT('%', #{subject}, '%')
+            </if>
+        </where>
+        GROUP BY t.id
+        LIMIT #{offset}, #{limit}
+    </select>
+    <select id="countTeacher" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT t.id)
+        FROM teacher t
+        LEFT JOIN teacher_subject ts ON t.id = ts.teacher_id
+        LEFT JOIN subject s ON ts.subject_id = s.id
+        <where>
+            <if test="realName != null and realName != ''">
+                AND t.real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="subject != null and subject != ''">
+                AND s.subject_name LIKE CONCAT('%', #{subject}, '%')
+            </if>
+        </where>
     </select>
 
 </mapper> 

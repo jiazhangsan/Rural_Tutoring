@@ -23,6 +23,7 @@ public class SecurityConfig {
                  .requestMatchers("/api/lesson/**").permitAll()   // 允许所有课程相关的接口访问
                  .requestMatchers("/api/homework/**").permitAll()   // 允许所有课程相关的接口访问
                  .requestMatchers("/api/user/wxLogin").permitAll()
+                 .requestMatchers("/api/subject/create").permitAll()
                  .requestMatchers("/admin/**").hasRole("ADMIN") // 管理员路径
                  // Swagger UI 相关路径
                  .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
