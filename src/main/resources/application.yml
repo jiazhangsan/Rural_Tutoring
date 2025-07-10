@@ -39,3 +39,7 @@ springdoc:
     operations-sorter: alpha
   api-docs:
     path: /v3/api-docs
+
+wx:
+  appid: wx4d0ca0f3e28bac31
+  secret: d205de1bb2fbd563c75e1538fb7fb54c

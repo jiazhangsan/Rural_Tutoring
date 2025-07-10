@@ -10,4 +10,5 @@ public class User {
     private String account;      // 账号
     private String passwordHash;  // 加密后的密码
     private Date createdAt;       // 注册时间
+    private String openid;
 }

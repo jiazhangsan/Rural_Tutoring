@@ -12,6 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import com.example.rural_tutoring.util.WxLoginRequest;
+import com.example.rural_tutoring.util.WxSessionResponse;
+import com.example.rural_tutoring.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * 用户管理控制器
@@ -26,6 +31,15 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Value("${wx.appid}")
+    private String wxAppId;
+
+    @Value("${wx.secret}")
+    private String wxSecret;
 
     /**
      * 新增用户
@@ -102,4 +116,30 @@ public class UserController {
         PageResult<User> result = userService.getUsersByPage(page, size, username);
         return Result.success(result);
     }
+
+    @PostMapping("/wxLogin")
+    public Result<UserDTO> wxLogin(@RequestBody WxLoginRequest request) {
+        String code = request.getCode();
+        if (code == null || code.isEmpty()) {
+            return Result.error("code不能为空");
+        }
+        // 1. 请求微信服务器获取openid和session_key
+        String url = String.format(
+            "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
+            wxAppId, wxSecret, code
+        );
+        RestTemplate restTemplate = new RestTemplate();
+        WxSessionResponse wxResp = restTemplate.getForObject(url, WxSessionResponse.class);
+        if (wxResp == null || wxResp.getOpenid() == null) {
+            return Result.error("微信登录失败");
+        }
+        // 2. 查找或注册用户
+        UserDTO userdto = userService.wxLoginOrRegister(wxResp.getOpenid(), request.getRoleId());
+        // 3. 生成token（可用JWT）
+        String token = jwtUtil.generateToken(userdto);
+        userdto.setToken(token);
+        return Result.success(userdto);
+    }
+
+
 }

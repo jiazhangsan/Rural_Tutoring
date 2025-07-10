@@ -9,4 +9,8 @@ public class UserDTO extends User {
      * 角色id
      */
     private Integer roleId;
+    
+    private String token;
+
+    
 }

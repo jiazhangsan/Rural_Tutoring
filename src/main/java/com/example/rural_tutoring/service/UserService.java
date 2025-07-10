@@ -13,4 +13,5 @@ public interface UserService {
     User getUserById(Integer id);
     List<User> getAllUsers();
     PageResult<User> getUsersByPage(Integer page, Integer size, String username);
+    UserDTO wxLoginOrRegister(String openid, Integer roleId);
 } 

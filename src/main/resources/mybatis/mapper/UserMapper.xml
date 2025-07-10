@@ -7,6 +7,11 @@
         INSERT INTO user (username, password_hash, created_at, account)
         VALUES (#{username}, #{passwordHash}, #{createdAt}, #{account})
     </insert>
+    <!--使用微信直接登录-->
+    <insert id="weChatRegistration" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (username, password_hash, created_at, account, open_id)
+        VALUES (#{username}, #{passwordHash}, #{createdAt}, #{account}, #{openid})
+    </insert>
 
     <delete id="deleteUser">
         DELETE FROM users WHERE id = #{id}
@@ -48,5 +53,9 @@
                 username LIKE CONCAT('%', #{username}, '%')
             </if>
         </where>
+    </select>
+
+    <select id="selectByOpenid" resultType="com.example.rural_tutoring.entity.User">
+        SELECT * FROM user WHERE openid = #{openid} LIMIT 1
     </select>
 </mapper>

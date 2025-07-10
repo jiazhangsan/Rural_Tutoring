@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -67,5 +69,29 @@ public class UserServiceImpl implements UserService {
         List<User> users = userMapper.selectUsersByPage(offset, size, username);
         long total = userMapper.countUsers(username);
         return new PageResult<>(users, total, page, size);
+    }
+
+    @Override
+    public UserDTO wxLoginOrRegister(String openid, Integer roleId) {
+        User user = userMapper.selectByOpenid(openid);
+        if (user == null) {
+            user = new User();
+            user.setOpenid(openid);
+            user.setUsername("wx_" + openid.substring(0, 8));
+
+            LocalDateTime now = LocalDateTime.now();
+            Date createdAtDate = Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+            user.setCreatedAt(createdAtDate);
+
+            userMapper.weChatRegistration(user);
+
+
+            userRoleMapper.insertUserRole(user.getId(), roleId);
+        }
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setOpenid(user.getOpenid());
+        return dto;
     }
 }
