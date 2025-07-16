@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.rural_tutoring.mapper.LessonImageMapper">
+
+
+    <insert id="insertLessonImage" parameterType="com.example.rural_tutoring.entity.LessonImage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO lesson_image (lesson_id, image_url, original_filename, upload_time)
+        VALUES (#{lessonId}, #{imageUrl}, #{originalFilename}, #{uploadTime})
+    </insert>
+</mapper>

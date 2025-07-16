@@ -117,6 +117,11 @@ public class UserController {
         return Result.success(result);
     }
 
+    /**
+     * @author jiashuhang
+     * @description 微信注册登录账号
+     * @date 2025-07-16 10:15
+     **/
     @PostMapping("/wxLogin")
     public Result<UserDTO> wxLogin(@RequestBody WxLoginRequest request) {
         String code = request.getCode();

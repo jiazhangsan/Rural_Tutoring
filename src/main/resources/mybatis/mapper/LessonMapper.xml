@@ -37,4 +37,36 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 检查教师是否是课程的创建者 -->
+    <select id="isTeacherOfLesson" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM teacher_lesson
+        WHERE lesson_id = #{lessonId} AND teacher_id = #{teacherId}
+    </select>
+
+    <!-- 更新课程信息 -->
+    <update id="updateLesson" parameterType="com.example.rural_tutoring.entity.Lesson">
+        UPDATE lesson
+        <set>
+            <if test="date != null">date = #{date},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="fee != null">fee = #{fee},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="notes != null">notes = #{notes},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="maxStudents != null">max_students = #{maxStudents},</if>
+            <if test="actualStudents != null">actual_students = #{actualStudents}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 获取课程下的所有学生 -->
+    <select id="getStudentsByLessonId" resultType="com.example.rural_tutoring.entity.Student">
+        SELECT s.*
+        FROM student s
+        INNER JOIN lesson_student ls ON s.id = ls.student_id
+        WHERE ls.lesson_id = #{lessonId}
+    </select>
+
 </mapper> 

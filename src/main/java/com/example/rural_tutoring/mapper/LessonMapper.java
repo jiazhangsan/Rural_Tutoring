@@ -4,6 +4,9 @@ import com.example.rural_tutoring.entity.Lesson;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+import com.example.rural_tutoring.entity.Student;
+
 @Mapper
 public interface LessonMapper {
     int insertLesson(Lesson lesson);
@@ -29,4 +32,19 @@ public interface LessonMapper {
      * 更新课程实际学生数
      */
     int updateActualStudents(@Param("id") Integer id, @Param("actualStudents") Integer actualStudents);
+
+    /**
+     * 检查指定教师是否是课程的创建者
+     */
+    boolean isTeacherOfLesson(@Param("lessonId") Integer lessonId, @Param("teacherId") Integer teacherId);
+
+    /**
+     * 更新课程信息
+     */
+    int updateLesson(Lesson lesson);
+
+    /**
+     * 获取课程下的所有学生
+     */
+    List<Student> getStudentsByLessonId(@Param("lessonId") Integer lessonId);
 }
