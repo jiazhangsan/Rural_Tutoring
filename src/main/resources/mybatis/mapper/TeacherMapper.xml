@@ -47,4 +47,11 @@
         </where>
     </select>
 
+    <select id="findLessonByTeacherId" resultType="com.example.rural_tutoring.entity.Lesson">
+        SELECT l.*
+        FROM teacher_lesson tl
+        INNER JOIN lesson l ON l.id = tl.lesson_id
+        WHERE tl.teacher_id = #{teacherId}
+    </select>
+
 </mapper> 

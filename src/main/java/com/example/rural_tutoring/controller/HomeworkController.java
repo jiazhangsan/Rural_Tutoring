@@ -4,6 +4,7 @@ import com.example.rural_tutoring.config.Result;
 import com.example.rural_tutoring.config.UserContextInterceptor;
 import com.example.rural_tutoring.entity.Homework;
 import com.example.rural_tutoring.entity.HomeworkAttachment;
+import com.example.rural_tutoring.entity.HomeworkImage;
 import com.example.rural_tutoring.service.FileService;
 import com.example.rural_tutoring.service.HomeworkService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -152,25 +153,67 @@ public class HomeworkController {
         }
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "HomeworkController is working!";
+
+    @Operation(summary = "学生提交作业", description = "学生提交作业图片格式，这里的作业要和发布的作业绑定在一起")
+    @PostMapping("/submitHomework/{homeworkId}")
+    public Result<List<HomeworkImage>> submitHomework(
+            @PathVariable Integer homeworkId,
+            @RequestPart(value = "images") MultipartFile[] images
+    ) {
+        System.out.println("调用学生提交作业接口！！！");
+        try {
+            // 验证图片格式和大小
+            for (MultipartFile image : images) {
+                if (!isValidImageType(image.getOriginalFilename())) {
+                    return Result.error("不支持的图片格式：" + image.getOriginalFilename());
+                }
+
+                // 验证文件大小（限制为5MB）
+                if (image.getSize() > 5 * 1024 * 1024) {
+                    return Result.error("单个图片大小不能超过5MB：" + image.getOriginalFilename());
+                }
+            }
+
+            // 上传图片并保存作业提交记录
+            List<HomeworkImage> homeworkImages = homeworkService.submitHomeworkImages(homeworkId, images);
+            return Result.success(homeworkImages);
+            
+        } catch (IllegalStateException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            return Result.error("提交作业失败：" + e.getMessage());
+        }
     }
 
+    /**
+     * 验证文件类型
+     */
     private boolean isValidFileType(String filename) {
-        if (filename == null) {
-            return false;
-        }else {
-            filename = filename.toLowerCase();
-        }
-        return filename.endsWith(".pdf") || 
-               filename.endsWith(".doc") || 
-               filename.endsWith(".docx");
+        if (filename == null) return false;
+        filename = filename.toLowerCase();
+        return filename.endsWith(".jpg") ||
+                filename.endsWith(".jpeg") ||
+                filename.endsWith(".png") ||
+                filename.endsWith(".pdf") ||
+                filename.endsWith(".doc") ||
+                filename.endsWith(".docx");
     }
 
     private String getFileExtension(String filename) {
         if (filename == null) return "";
         int lastDotIndex = filename.lastIndexOf('.');
         return lastDotIndex > 0 ? filename.substring(lastDotIndex + 1).toLowerCase() : "";
+    }
+
+    /**
+     * 验证图片类型
+     */
+    private boolean isValidImageType(String filename) {
+        if (filename == null) return false;
+        filename = filename.toLowerCase();
+        return filename.endsWith(".jpg") ||
+                filename.endsWith(".jpeg") ||
+                filename.endsWith(".png") ||
+                filename.endsWith(".gif");
     }
 }

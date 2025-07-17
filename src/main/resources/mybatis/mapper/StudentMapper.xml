@@ -20,4 +20,9 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 根据用户ID获取学生ID -->
+    <select id="getStudentIdByUserId" resultType="java.lang.Integer">
+        SELECT id FROM student WHERE user_id = #{userId}
+    </select>
+
 </mapper>

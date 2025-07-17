@@ -1,6 +1,7 @@
 package com.example.rural_tutoring.service.impl;
 
 import com.example.rural_tutoring.entity.Teacher;
+import com.example.rural_tutoring.entity.Lesson;
 import com.example.rural_tutoring.config.Result;
 import com.example.rural_tutoring.entity.User;
 import com.example.rural_tutoring.mapper.TeacherMapper;
@@ -36,5 +37,10 @@ public class TeacherServiceImpl implements TeacherService {
         List<Teacher> teachers = teacherMapper.findTeacherByCondition(offset, size, realName, subject);
         long total = teacherMapper.countTeacher(realName, subject);
         return new PageResult<>(teachers, total, page, size);
+    }
+
+    @Override
+    public List<Lesson> findLessonByTeacherId(Long teacherId) {
+        return teacherMapper.findLessonByTeacherId(teacherId);
     }
 } 

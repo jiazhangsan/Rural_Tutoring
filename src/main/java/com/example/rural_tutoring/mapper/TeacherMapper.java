@@ -1,6 +1,7 @@
 package com.example.rural_tutoring.mapper;
 
 import com.example.rural_tutoring.entity.Teacher;
+import com.example.rural_tutoring.entity.Lesson;
 import com.example.rural_tutoring.model.DTO.TeacherDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,4 +29,11 @@ public interface TeacherMapper {
      * @return
      */
     int insertTeacherSubject(TeacherDTO teacherDTO);
+
+    /**
+     * 根据老师ID查询所有课程
+     * @param teacherId 老师ID
+     * @return 课程列表
+     */
+    List<Lesson> findLessonByTeacherId(@Param("teacherId") Long teacherId);
 }

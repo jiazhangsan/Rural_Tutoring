@@ -21,4 +21,9 @@ public interface StudentMapper {
 
     @Select("SELECT * FROM student")
     List<Student> selectAll();
+
+    /**
+     * 根据用户ID获取学生ID
+     */
+    Integer getStudentIdByUserId(@Param("userId") Integer userId);
 }

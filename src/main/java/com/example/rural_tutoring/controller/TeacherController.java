@@ -1,6 +1,7 @@
 package com.example.rural_tutoring.controller;
 
 import com.example.rural_tutoring.config.Result;
+import com.example.rural_tutoring.entity.Lesson;
 import com.example.rural_tutoring.entity.Teacher;
 import com.example.rural_tutoring.entity.User;
 import com.example.rural_tutoring.model.DTO.TeacherDTO;
@@ -53,4 +54,13 @@ public class TeacherController {
 
         return Result.success(result);
     }
+
+    @Operation(summary = "查找老师下的所有课程", description = "查询指定老师下的所有课程")
+    @GetMapping("/findLessonByTeacherId")
+    public Result<List<Lesson>> findCourseByTeacherId(@RequestParam Long teacherId) {
+        List<Lesson> lessons = teacherService.findLessonByTeacherId(teacherId);
+        return Result.success(lessons);
+    }
+
+
 }

@@ -2,10 +2,10 @@ package com.example.rural_tutoring.service;
 
 import com.example.rural_tutoring.entity.Lesson;
 import com.example.rural_tutoring.entity.LessonImage;
+import com.example.rural_tutoring.entity.Student;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import com.example.rural_tutoring.entity.Student;
 
 public interface LessonService {
 

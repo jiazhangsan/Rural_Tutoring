@@ -9,9 +9,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     
+    @Bean
+    public UserContextInterceptor userContextInterceptor() {
+        return new UserContextInterceptor();
+    }
+    
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new UserContextInterceptor())
+        registry.addInterceptor(userContextInterceptor())
                 .addPathPatterns("/api/**")  // 拦截所有/api/开头的请求
                 .excludePathPatterns("/api/auth/**"); // 排除登录等不需要用户信息的接口
     }

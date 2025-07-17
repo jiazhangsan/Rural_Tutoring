@@ -43,3 +43,10 @@ springdoc:
 wx:
   appid: wx4d0ca0f3e28bac31
   secret: d205de1bb2fbd563c75e1538fb7fb54c
+
+minio:
+  endpoint: http://47.120.65.129:9000  # MinIO服务器地址
+  accessKey: admin               # MinIO访问密钥
+  secretKey: admin123               # MinIO密钥
+  bucket:
+    files: education                  # 存储桶名称
