@@ -2,6 +2,8 @@ package com.example.rural_tutoring.controller;
 
 import com.example.rural_tutoring.config.Result;
 import com.example.rural_tutoring.entity.Student;
+import com.example.rural_tutoring.entity.TutoringNeed;
+import com.example.rural_tutoring.config.UserContextInterceptor;
 import com.example.rural_tutoring.service.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -44,7 +46,7 @@ public class StudentController {
      */
     @Operation(summary = "删除学生", description = "根据学生ID删除学生")
     @DeleteMapping("/{id}")
-    public int deleteStudent(@Parameter(description = "学生ID", example = "S001") @PathVariable String id) {
+    public int deleteStudent(@Parameter(description = "学生ID", example = "1") @PathVariable Integer id) {
         return studentService.deleteStudent(id);
     }
 
@@ -62,7 +64,7 @@ public class StudentController {
      */
     @Operation(summary = "查询单个学生", description = "根据学生ID查询学生详情")
     @GetMapping("/{id}")
-    public Student getStudent(@Parameter(description = "学生ID", example = "S001") @PathVariable String id) {
+    public Student getStudent(@Parameter(description = "学生ID", example = "1") @PathVariable Integer id) {
         return studentService.getStudent(id);
     }
 
@@ -77,6 +79,26 @@ public class StudentController {
             return Result.success(allStudents);
         } else {
             return Result.error("获取所有学生数据失败！");
+        }
+    }
+
+    @Operation(summary = "学生发布找家教老师的需求", description = "学生发布找家教老师的需求")
+    @PostMapping("/publishNeed")
+    public Result<TutoringNeed> publishNeed(@RequestBody TutoringNeed tutoringNeed) {
+        // 获取当前登录用户ID
+        Integer currentUserId = UserContextInterceptor.getCurrentUserId();
+        if (currentUserId == null) {
+            return Result.error("未登录");
+        }
+        
+        // 设置学生ID
+        tutoringNeed.setStudentId(currentUserId);
+        
+        int i = studentService.publishNeed(tutoringNeed);
+        if (i > 0) {
+            return Result.success(tutoringNeed);
+        } else {
+            return Result.error("发布失败");
         }
     }
 }
