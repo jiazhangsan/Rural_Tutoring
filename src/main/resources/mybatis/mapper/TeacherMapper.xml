@@ -112,7 +112,6 @@
                 ) &lt;= #{searchRadius}
             </if>
         </where>
-        GROUP BY t.id
         <choose>
             <!-- 如果优先显示附近老师，则按距离排序 -->
             <when test="prioritizeNearby != null and prioritizeNearby == true and userLatitude != null and userLongitude != null">
