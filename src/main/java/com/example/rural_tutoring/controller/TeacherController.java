@@ -5,7 +5,9 @@ import com.example.rural_tutoring.entity.Lesson;
 import com.example.rural_tutoring.entity.Teacher;
 import com.example.rural_tutoring.entity.User;
 import com.example.rural_tutoring.model.DTO.TeacherDTO;
+import com.example.rural_tutoring.model.DTO.TeacherSearchDTO;
 import com.example.rural_tutoring.model.PageResult;
+import com.example.rural_tutoring.model.VO.TeacherVO;
 import com.example.rural_tutoring.service.TeacherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,6 +57,13 @@ public class TeacherController {
         return Result.success(result);
     }
 
+    @Operation(summary = "基于地理位置和条件查找老师", description = "支持按地理位置、大学、科目等条件查找老师，优先推荐附近5公里内的老师")
+    @PostMapping("/findTeacherByLocation")
+    public Result<PageResult<TeacherVO>> findTeacherByLocation(@RequestBody TeacherSearchDTO searchDTO) {
+        PageResult<TeacherVO> result = teacherService.findTeacherByLocationAndCondition(searchDTO);
+        return Result.success(result);
+    }
+
     @Operation(summary = "查找老师下的所有课程", description = "查询指定老师下的所有课程")
     @GetMapping("/findLessonByTeacherId")
     public Result<List<Lesson>> findCourseByTeacherId(@RequestParam Long teacherId) {
@@ -62,5 +71,15 @@ public class TeacherController {
         return Result.success(lessons);
     }
 
+    @Operation(summary = "更新教师地理位置信息", description = "更新教师的经纬度、地址等信息")
+    @PutMapping("/updateLocation")
+    public Result<Void> updateTeacherLocation(@RequestBody Teacher teacher) {
+        int result = teacherService.updateTeacherLocation(teacher);
+        if (result > 0) {
+            return Result.success(null);
+        } else {
+            return Result.error("更新失败");
+        }
+    }
 
 }

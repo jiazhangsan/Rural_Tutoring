@@ -4,7 +4,9 @@ import com.example.rural_tutoring.config.Result;
 import com.example.rural_tutoring.entity.User;
 import com.example.rural_tutoring.model.DTO.UserDTO;
 import com.example.rural_tutoring.model.PageResult;
+import com.example.rural_tutoring.service.FrontendImageService;
 import com.example.rural_tutoring.service.UserService;
+import com.example.rural_tutoring.service.TeacherVerificationCodeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +19,8 @@ import com.example.rural_tutoring.util.WxSessionResponse;
 import com.example.rural_tutoring.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 用户管理控制器
@@ -34,6 +38,12 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private FrontendImageService frontendImageService;
+
+    @Autowired
+    private TeacherVerificationCodeService verificationCodeService;
 
     @Value("${wx.appid}")
     private String wxAppId;
@@ -120,30 +130,97 @@ public class UserController {
     /**
      * @author jiashuhang
      * @description 微信注册登录账号
+     * 1、注册分为两种情况，第一种是学生注册，第二种是老师注册，老师注册要有老师验证码
+     * 2、在注册的时候要操作的表有学生表，用户表。和老师表和用户表
+     *
      * @date 2025-07-16 10:15
      **/
     @PostMapping("/wxLogin")
-    public Result<UserDTO> wxLogin(@RequestBody WxLoginRequest request) {
+    public Result<UserDTO> wxLogin(@ModelAttribute WxLoginRequest request) {
         String code = request.getCode();
         if (code == null || code.isEmpty()) {
             return Result.error("code不能为空");
         }
+        
+        // 验证老师验证码（如果提供的话）
+        String teacherVerificationCode = request.getTeacherVerificationCode();
+        if (teacherVerificationCode != null && !teacherVerificationCode.isEmpty()) {
+            if (!verificationCodeService.validateVerificationCode(teacherVerificationCode)) {
+                return Result.error("老师验证码无效或已过期");
+            }
+        }
+        
         // 1. 请求微信服务器获取openid和session_key
         String url = String.format(
             "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
             wxAppId, wxSecret, code
         );
         RestTemplate restTemplate = new RestTemplate();
-        WxSessionResponse wxResp = restTemplate.getForObject(url, WxSessionResponse.class);
-        if (wxResp == null || wxResp.getOpenid() == null) {
-            return Result.error("微信登录失败");
+        
+        try {
+            // 先获取字符串响应
+            String responseStr = restTemplate.getForObject(url, String.class);
+            System.out.println("微信响应：" + responseStr);
+            
+            // 手动解析JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            WxSessionResponse wxResp = objectMapper.readValue(responseStr, WxSessionResponse.class);
+            
+            if (wxResp == null || wxResp.getOpenid() == null) {
+                return Result.error("微信登录失败");
+            }
+            
+            // 处理头像文件上传
+            String avatarUrl = null;
+            if (request.getAvatarFile() != null && !request.getAvatarFile().isEmpty()) {
+                try {
+                    // 这里可以调用文件上传服务
+                     avatarUrl = frontendImageService.uploadFrontendImage(request.getAvatarFile(), "avatar");
+                    // 暂时使用简单的方式
+//                    avatarUrl = "/uploads/avatar/" + request.getAvatarFile().getOriginalFilename();
+                } catch (Exception e) {
+                    System.out.println("头像上传失败: " + e.getMessage());
+                }
+            }
+            
+            // 2. 根据teacherVerificationCode决定注册类型
+            UserDTO userdto;
+            if (teacherVerificationCode != null && !teacherVerificationCode.isEmpty()) {
+                // 注册为教师
+                userdto = userService.wxLoginOrRegisterAsTeacher(
+
+                    wxResp.getOpenid(), 
+                    request.getUsername(),
+                    request.getPhoneNumber(),
+                    avatarUrl,
+                    teacherVerificationCode,
+                        request.getRoleId(),
+                        request.getSubjectId()
+                );
+                // 使用验证码（增加使用次数）
+                verificationCodeService.useVerificationCode(teacherVerificationCode);
+            } else {
+                // 注册为学生
+                userdto = userService.wxLoginOrRegisterAsStudent(
+                    wxResp.getOpenid(),
+                    request.getUsername(),
+                    request.getPhoneNumber(),
+                    avatarUrl,
+                    request.getGradeId(),
+                        request.getRoleId()
+                );
+            }
+
+            userdto.setSession_key(wxResp.getSession_key());
+
+            // 3. 生成token（可用JWT）
+            String token = jwtUtil.generateToken(userdto);
+            userdto.setToken(token);
+            return Result.success(userdto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("微信登录失败：" + e.getMessage());
         }
-        // 2. 查找或注册用户
-        UserDTO userdto = userService.wxLoginOrRegister(wxResp.getOpenid(), request.getRoleId());
-        // 3. 生成token（可用JWT）
-        String token = jwtUtil.generateToken(userdto);
-        userdto.setToken(token);
-        return Result.success(userdto);
     }
 
 

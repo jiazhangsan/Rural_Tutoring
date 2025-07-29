@@ -5,17 +5,19 @@
 <mapper namespace="com.example.rural_tutoring.mapper.TeacherMapper">
 
     <insert id="insertTeacher" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO teacher (real_name, university, major, user_id)
-        VALUES (#{realName}, #{university}, #{major}, #{user_id})
+        INSERT INTO teacher (real_name, university, major, user_id, latitude, longitude, address, city, district, province, teacher_verification_code)
+        VALUES (#{realName}, #{university}, #{major}, #{userId}, #{latitude}, #{longitude}, #{address}, #{city}, #{district}, #{province}, #{teacherVerificationCode})
     </insert>
 
     <insert id="insertTeacherSubject">
         INSERT INTO teacher_subject (subject_id, teacher_id)
         VALUES (#{subjectId}, #{id})
     </insert>
+    
     <select id="getTeacherIdByUserId" resultType="java.lang.Integer">
         select teacher.id from teacher where user_id = #{currentUserId};
     </select>
+    
     <select id="findTeacherByCondition" resultType="com.example.rural_tutoring.entity.Teacher">
         SELECT t.*
         FROM teacher t
@@ -32,6 +34,7 @@
         GROUP BY t.id
         LIMIT #{offset}, #{limit}
     </select>
+    
     <select id="countTeacher" resultType="java.lang.Long">
         SELECT COUNT(DISTINCT t.id)
         FROM teacher t
@@ -53,5 +56,135 @@
         INNER JOIN lesson l ON l.id = tl.lesson_id
         WHERE tl.teacher_id = #{teacherId}
     </select>
+    
+    <!-- 基于地理位置和条件搜索教师 -->
+    <select id="findTeacherByLocationAndCondition" resultType="com.example.rural_tutoring.model.VO.TeacherVO">
+        SELECT 
+            t.*,
+            <!-- 计算距离（使用Haversine公式） -->
+            (
+                6371 * acos(
+                    cos(radians(#{userLatitude})) * cos(radians(t.latitude)) * 
+                    cos(radians(t.longitude) - radians(#{userLongitude})) + 
+                    sin(radians(#{userLatitude})) * sin(radians(t.latitude))
+                )
+            ) as distance,
+            <!-- 判断是否在搜索半径内 -->
+            CASE 
+                WHEN (
+                    6371 * acos(
+                        cos(radians(#{userLatitude})) * cos(radians(t.latitude)) * 
+                        cos(radians(t.longitude) - radians(#{userLongitude})) + 
+                        sin(radians(#{userLatitude})) * sin(radians(t.latitude))
+                    )
+                ) &lt;= #{searchRadius} THEN 1 
+                ELSE 0 
+            END as isNearby
+        FROM teacher t
+        LEFT JOIN teacher_subject ts ON t.id = ts.teacher_id
+        LEFT JOIN subject s ON ts.subject_id = s.id
+        <where>
+            <!-- 基础条件 -->
+            <if test="realName != null and realName != ''">
+                AND t.real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="subject != null and subject != ''">
+                AND s.subject_name LIKE CONCAT('%', #{subject}, '%')
+            </if>
+            <if test="university != null and university != ''">
+                AND t.university LIKE CONCAT('%', #{university}, '%')
+            </if>
+            <if test="city != null and city != ''">
+                AND t.city LIKE CONCAT('%', #{city}, '%')
+            </if>
+            <if test="district != null and district != ''">
+                AND t.district LIKE CONCAT('%', #{district}, '%')
+            </if>
+            
+            <!-- 地理位置条件 -->
+            <if test="userLatitude != null and userLongitude != null and searchRadius != null">
+                AND (
+                    6371 * acos(
+                        cos(radians(#{userLatitude})) * cos(radians(t.latitude)) * 
+                        cos(radians(t.longitude) - radians(#{userLongitude})) + 
+                        sin(radians(#{userLatitude})) * sin(radians(t.latitude))
+                    )
+                ) &lt;= #{searchRadius}
+            </if>
+        </where>
+        GROUP BY t.id
+        <choose>
+            <!-- 如果优先显示附近老师，则按距离排序 -->
+            <when test="prioritizeNearby != null and prioritizeNearby == true and userLatitude != null and userLongitude != null">
+                ORDER BY 
+                    CASE 
+                        WHEN (
+                            6371 * acos(
+                                cos(radians(#{userLatitude})) * cos(radians(t.latitude)) * 
+                                cos(radians(t.longitude) - radians(#{userLongitude})) + 
+                                sin(radians(#{userLatitude})) * sin(radians(t.latitude))
+                            )
+                        ) &lt;= #{searchRadius} THEN 0 
+                        ELSE 1 
+                    END,
+                    distance ASC
+            </when>
+            <!-- 否则按大学名称排序 -->
+            <otherwise>
+                ORDER BY t.university ASC, t.real_name ASC
+            </otherwise>
+        </choose>
+        LIMIT #{page}, #{size}
+    </select>
+    
+    <!-- 统计符合条件的教师数量 -->
+    <select id="countTeacherByLocationAndCondition" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT t.id)
+        FROM teacher t
+        LEFT JOIN teacher_subject ts ON t.id = ts.teacher_id
+        LEFT JOIN subject s ON ts.subject_id = s.id
+        <where>
+            <!-- 基础条件 -->
+            <if test="realName != null and realName != ''">
+                AND t.real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="subject != null and subject != ''">
+                AND s.subject_name LIKE CONCAT('%', #{subject}, '%')
+            </if>
+            <if test="university != null and university != ''">
+                AND t.university LIKE CONCAT('%', #{university}, '%')
+            </if>
+            <if test="city != null and city != ''">
+                AND t.city LIKE CONCAT('%', #{city}, '%')
+            </if>
+            <if test="district != null and district != ''">
+                AND t.district LIKE CONCAT('%', #{district}, '%')
+            </if>
+            
+            <!-- 地理位置条件 -->
+            <if test="userLatitude != null and userLongitude != null and searchRadius != null">
+                AND (
+                    6371 * acos(
+                        cos(radians(#{userLatitude})) * cos(radians(t.latitude)) * 
+                        cos(radians(t.longitude) - radians(#{userLongitude})) + 
+                        sin(radians(#{userLatitude})) * sin(radians(t.latitude))
+                    )
+                ) &lt;= #{searchRadius}
+            </if>
+        </where>
+    </select>
+    
+    <!-- 更新教师地理位置信息 -->
+    <update id="updateTeacherLocation">
+        UPDATE teacher 
+        SET 
+            latitude = #{latitude},
+            longitude = #{longitude},
+            address = #{address},
+            city = #{city},
+            district = #{district},
+            province = #{province}
+        WHERE id = #{id}
+    </update>
 
 </mapper> 

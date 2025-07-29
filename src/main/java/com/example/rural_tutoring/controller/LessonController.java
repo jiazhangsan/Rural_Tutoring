@@ -183,6 +183,48 @@ public class LessonController {
                 filename.endsWith(".png") ||
                 filename.endsWith(".gif");
     }
+    @Operation(summary = "上传视频", description = "上传视频到课程")
+    @PostMapping("/uploadVideo")
+    public Result<String> uploadVideo(@RequestParam("file") MultipartFile file) {
+        try {
+            // 验证文件类型
+            if (!isValidVideoType(file.getOriginalFilename())) {
+                return Result.error("不支持的文件类型，仅支持视频格式（mp4, avi, mov, wmv, flv, webm, mkv）");
+            }
+
+            // 验证文件大小（限制为500MB）
+            if (file.getSize() > 500 * 1024 * 1024) {
+                return Result.error("文件大小不能超过500MB");
+            }
+
+            // 验证文件是否为空
+            if (file.isEmpty()) {
+                return Result.error("文件不能为空");
+            }
+
+            String videoUrl = fileService.uploadFile(file, "video");
+            return Result.success(videoUrl);
+        } catch (Exception e) {
+            return Result.error("上传失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 验证视频文件类型
+     */
+    private boolean isValidVideoType(String filename) {
+        if (filename == null) {
+            return false;
+        }
+        String extension = filename.toLowerCase();
+        return extension.endsWith(".mp4") || 
+               extension.endsWith(".avi") || 
+               extension.endsWith(".mov") || 
+               extension.endsWith(".wmv") || 
+               extension.endsWith(".flv") || 
+               extension.endsWith(".webm") || 
+               extension.endsWith(".mkv");
+    }
 
 
 

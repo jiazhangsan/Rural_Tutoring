@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.rural_tutoring.mapper.HomeworkImageMapper">
+    
+    <!-- 插入作业图片记录 -->
+    <insert id="insertHomeworkImage" parameterType="com.example.rural_tutoring.entity.HomeworkImage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO homework_image (
+            homework_id,
+            student_id,
+            image_url,
+            upload_time,
+            status
+        ) VALUES (
+            #{homeworkId},
+            #{studentId},
+            #{imageUrl},
+            #{uploadTime},
+            'SUBMITTED'
+        )
+    </insert>
+
+    <!-- 根据作业ID获取所有图片 -->
+    <select id="getImagesByHomeworkId" resultType="com.example.rural_tutoring.entity.HomeworkImage">
+        SELECT *
+        FROM homework_image
+        WHERE homework_id = #{homeworkId}
+        ORDER BY upload_time DESC
+    </select>
+
+    <!-- 根据作业ID和学生ID获取图片 -->
+    <select id="getImagesByHomeworkAndStudent" resultType="com.example.rural_tutoring.entity.HomeworkImage">
+        SELECT *
+        FROM homework_image
+        WHERE homework_id = #{homeworkId}
+        AND student_id = #{studentId}
+        ORDER BY upload_time DESC
+    </select>
+
+    <!-- 更新图片状态和评语 -->
+    <update id="updateStatusAndComment">
+        UPDATE homework_image
+        SET status = #{status},
+            comment = #{comment}
+        WHERE id = #{id}
+    </update>
+
+</mapper> 

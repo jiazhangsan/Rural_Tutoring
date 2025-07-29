@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.rural_tutoring.mapper.GradeMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="GradeResultMap" type="com.example.rural_tutoring.entity.Grade">
+        <id column="id" property="id"/>
+        <result column="description" property="description"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <!-- 插入年级 -->
+    <insert id="insertGrade" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO grade (description, sort_order)
+        VALUES (#{description}, #{sortOrder})
+    </insert>
+
+    <!-- 根据ID删除年级 -->
+    <delete id="deleteGradeById">
+        DELETE FROM grade WHERE id = #{id}
+    </delete>
+
+    <!-- 更新年级 -->
+    <update id="updateGrade">
+        UPDATE grade 
+        SET description = #{description},
+            sort_order = #{sortOrder},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询年级 -->
+    <select id="selectGradeById" resultMap="GradeResultMap">
+        SELECT * FROM grade WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有年级 -->
+    <select id="selectAllGrades" resultMap="GradeResultMap">
+        SELECT * FROM grade ORDER BY sort_order ASC
+    </select>
+
+    <!-- 分页查询年级 -->
+    <select id="selectGradesByPage" resultMap="GradeResultMap">
+        SELECT * FROM grade 
+        ORDER BY sort_order ASC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <!-- 统计年级总数 -->
+    <select id="countGrades" resultType="long">
+        SELECT COUNT(*) FROM grade
+    </select>
+
+</mapper> 

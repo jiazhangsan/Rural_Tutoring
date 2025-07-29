@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.rural_tutoring.mapper.TeacherVerificationCodeMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="TeacherVerificationCodeResultMap" type="com.example.rural_tutoring.entity.TeacherVerificationCode">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="description" property="description"/>
+        <result column="is_active" property="isActive"/>
+        <result column="max_usage" property="maxUsage"/>
+        <result column="used_count" property="usedCount"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <!-- 插入验证码 -->
+    <insert id="insertVerificationCode" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO teacher_verification_code (code, description, is_active, max_usage, used_count, created_by)
+        VALUES (#{code}, #{description}, #{isActive}, #{maxUsage}, #{usedCount}, #{createdBy})
+    </insert>
+
+    <!-- 根据ID删除验证码 -->
+    <delete id="deleteVerificationCodeById">
+        DELETE FROM teacher_verification_code WHERE id = #{id}
+    </delete>
+
+    <!-- 更新验证码 -->
+    <update id="updateVerificationCode">
+        UPDATE teacher_verification_code 
+        SET description = #{description},
+            is_active = #{isActive},
+            max_usage = #{maxUsage},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询验证码 -->
+    <select id="selectVerificationCodeById" resultMap="TeacherVerificationCodeResultMap">
+        SELECT * FROM teacher_verification_code WHERE id = #{id}
+    </select>
+
+    <!-- 根据验证码查询 -->
+    <select id="selectVerificationCodeByCode" resultMap="TeacherVerificationCodeResultMap">
+        SELECT * FROM teacher_verification_code WHERE code = #{code}
+    </select>
+
+    <!-- 查询所有验证码 -->
+    <select id="selectAllVerificationCodes" resultMap="TeacherVerificationCodeResultMap">
+        SELECT * FROM teacher_verification_code ORDER BY created_at DESC
+    </select>
+
+    <!-- 分页查询验证码 -->
+    <select id="selectVerificationCodesByPage" resultMap="TeacherVerificationCodeResultMap">
+        SELECT * FROM teacher_verification_code 
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <!-- 统计验证码总数 -->
+    <select id="countVerificationCodes" resultType="long">
+        SELECT COUNT(*) FROM teacher_verification_code
+    </select>
+
+    <!-- 增加使用次数 -->
+    <update id="incrementUsedCount">
+        UPDATE teacher_verification_code 
+        SET used_count = used_count + 1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- 检查验证码是否有效 -->
+    <select id="checkValidVerificationCode" resultMap="TeacherVerificationCodeResultMap">
+        SELECT * FROM teacher_verification_code 
+        WHERE code = #{code} 
+        AND is_active = 1
+        AND (max_usage = -1 OR used_count &lt; max_usage)
+        LIMIT 1
+    </select>
+
+</mapper> 

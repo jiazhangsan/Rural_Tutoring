@@ -9,8 +9,8 @@
     </insert>
     <!--使用微信直接登录-->
     <insert id="weChatRegistration" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO user (username, password_hash, created_at, account, open_id)
-        VALUES (#{username}, #{passwordHash}, #{createdAt}, #{account}, #{openid})
+        INSERT INTO user (username, password_hash, created_at, account, open_id, phone_number, avatar_url)
+        VALUES (#{username}, #{passwordHash}, #{createdAt}, #{account}, #{openid}, #{phoneNumber}, #{avatarUrl})
     </insert>
 
     <delete id="deleteUser">
@@ -56,6 +56,6 @@
     </select>
 
     <select id="selectByOpenid" resultType="com.example.rural_tutoring.entity.User">
-        SELECT * FROM user WHERE openid = #{openid} LIMIT 1
+        SELECT * FROM user WHERE open_id = #{openid} LIMIT 1
     </select>
 </mapper>

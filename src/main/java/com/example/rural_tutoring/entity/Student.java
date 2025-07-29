@@ -16,7 +16,7 @@ public class Student {
     private String gender; // 性别
     private int age; // 年龄
     private String school; // 学校
-    private String grade; // 年级
+    private Integer gradeId; // 年级
     private String parentContact; // 家长联系方式
     private Integer userId; // 用户id
 }

@@ -4,8 +4,8 @@
 <mapper namespace="com.example.rural_tutoring.mapper.StudentMapper">
 
     <insert id="insert" parameterType="com.example.rural_tutoring.entity.Student" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO student (name, gender, age, school, grade, parent_contact, user_id)
-        VALUES (#{name}, #{gender}, #{age}, #{school}, #{grade}, #{parentContact}, #{userId})
+        INSERT INTO student (name, gender, age, school, grade_id, parent_contact, user_id)
+        VALUES (#{name}, #{gender}, #{age}, #{school}, #{gradeId}, #{parentContact}, #{userId})
     </insert>
 
     <update id="update" parameterType="com.example.rural_tutoring.entity.Student">

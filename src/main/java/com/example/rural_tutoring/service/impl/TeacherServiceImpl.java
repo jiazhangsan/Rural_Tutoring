@@ -6,7 +6,9 @@ import com.example.rural_tutoring.config.Result;
 import com.example.rural_tutoring.entity.User;
 import com.example.rural_tutoring.mapper.TeacherMapper;
 import com.example.rural_tutoring.model.DTO.TeacherDTO;
+import com.example.rural_tutoring.model.DTO.TeacherSearchDTO;
 import com.example.rural_tutoring.model.PageResult;
+import com.example.rural_tutoring.model.VO.TeacherVO;
 import com.example.rural_tutoring.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     @Transactional
     public int addTeacher(TeacherDTO teacherDTO) {
+
+        System.out.println("执行添加教师功能："+teacherDTO);
 
         int i = teacherMapper.insertTeacher(teacherDTO);
         int j = teacherMapper.insertTeacherSubject(teacherDTO);
@@ -42,5 +46,41 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public List<Lesson> findLessonByTeacherId(Long teacherId) {
         return teacherMapper.findLessonByTeacherId(teacherId);
+    }
+    
+    @Override
+    public PageResult<TeacherVO> findTeacherByLocationAndCondition(TeacherSearchDTO searchDTO) {
+        // 参数验证
+        if (searchDTO.getPage() == null || searchDTO.getPage() < 1) {
+            searchDTO.setPage(1);
+        }
+        if (searchDTO.getSize() == null || searchDTO.getSize() < 1) {
+            searchDTO.setSize(10);
+        }
+        if (searchDTO.getSearchRadius() == null || searchDTO.getSearchRadius() <= 0) {
+            searchDTO.setSearchRadius(5.0); // 默认5公里
+        }
+        
+        // 计算分页偏移量
+        int offset = (searchDTO.getPage() - 1) * searchDTO.getSize();
+        searchDTO.setPage(offset);
+        searchDTO.setSize(searchDTO.getSize());
+        
+        // 查询教师列表
+        List<TeacherVO> teachers = teacherMapper.findTeacherByLocationAndCondition(searchDTO);
+        
+        // 查询总数
+        long total = teacherMapper.countTeacherByLocationAndCondition(searchDTO);
+        
+        return new PageResult<>(teachers, total, searchDTO.getPage(), searchDTO.getSize());
+    }
+    
+    @Override
+    @Transactional
+    public int updateTeacherLocation(Teacher teacher) {
+        if (teacher == null || teacher.getId() == null) {
+            throw new IllegalArgumentException("教师ID不能为空");
+        }
+        return teacherMapper.updateTeacherLocation(teacher);
     }
 } 

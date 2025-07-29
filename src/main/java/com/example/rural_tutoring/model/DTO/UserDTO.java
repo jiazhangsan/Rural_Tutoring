@@ -12,5 +12,7 @@ public class UserDTO extends User {
     
     private String token;
 
+    private String session_key;
+
     
 }

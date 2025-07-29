@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.rural_tutoring.mapper.TutoringNeedMapper">
+    <insert id="insertTutoringNeed" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tutoring_need (
+            student_id, subject, grade, description, location,
+            expected_price, time_requirement, contact_phone, status,
+            create_time, update_time
+        )
+        VALUES (
+            #{studentId}, #{subject}, #{grade}, #{description}, #{location},
+            #{expectedPrice}, #{timeRequirement}, #{contactPhone}, 0,
+            NOW(), NOW()
+        )
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE tutoring_need
+        SET status = #{status},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="findByStudentId" resultType="com.example.rural_tutoring.entity.TutoringNeed">
+        SELECT *
+        FROM tutoring_need
+        WHERE student_id = #{studentId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findByCondition" resultType="com.example.rural_tutoring.entity.TutoringNeed">
+        SELECT *
+        FROM tutoring_need
+        <where>
+            <if test="subject != null and subject != ''">
+                AND subject = #{subject}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+</mapper> 

@@ -41,8 +41,8 @@ springdoc:
     path: /v3/api-docs
 
 wx:
-  appid: wx4d0ca0f3e28bac31
-  secret: d205de1bb2fbd563c75e1538fb7fb54c
+  appid: wx3979b93cf4c7cef3
+  secret: f7168976e88ca341249c320a7461dfd2
 
 minio:
   endpoint: http://47.120.65.129:9000  # MinIO服务器地址

@@ -11,4 +11,8 @@ public class User {
     private String passwordHash;  // 加密后的密码
     private Date createdAt;       // 注册时间
     private String openid;
+    private String phoneNumber;  //手机号
+    private String avatarUrl;  // 头像链接
+
+
 }
