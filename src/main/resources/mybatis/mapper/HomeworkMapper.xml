@@ -39,4 +39,38 @@
             #{lessonId}, #{title}, #{content}, #{deadline}, #{createdBy}, #{createdAt}, #{status}
         )
     </insert>
+
+    <!-- 根据条件查询作业 -->
+    <select id="getHomeworksByCondition" resultMap="BaseResultMap">
+        SELECT 
+        <include refid="Base_Column_List"/>
+        FROM homework
+        <where>
+            <!-- 课程筛选 -->
+            <if test="lessonId != null">
+                AND lesson_id = #{lessonId}
+            </if>
+            <!-- 状态筛选 -->
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 查询学生加入课程的所有作业 -->
+    <select id="getStudentHomeworks" resultMap="BaseResultMap">
+        SELECT DISTINCT h.*
+        FROM homework h
+        INNER JOIN lesson_student ls ON h.lesson_id = ls.lesson_id
+        WHERE ls.student_id = #{studentId}
+        <if test="lessonId != null">
+            AND h.lesson_id = #{lessonId}
+        </if>
+        <if test="status != null and status != ''">
+            AND h.status = #{status}
+        </if>
+        ORDER BY h.created_at DESC
+    </select>
+
 </mapper> 

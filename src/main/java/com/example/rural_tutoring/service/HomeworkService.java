@@ -44,4 +44,21 @@ public interface HomeworkService {
      * @return 作业附件信息列表
      */
     List<HomeworkImage> submitHomeworkImages(Integer homeworkId, MultipartFile[] images);
+
+    /**
+     * 根据条件查询作业
+     * @param lessonId 课程ID（可选）
+     * @param status 作业状态（可选）
+     * @return 作业列表
+     */
+    List<Homework> getHomeworksByCondition(Integer lessonId, Homework.HomeworkStatus status);
+
+    /**
+     * 查询学生加入课程的所有作业
+     * @param studentId 学生ID
+     * @param lessonId 课程ID（可选）
+     * @param status 作业状态（可选）
+     * @return 作业列表
+     */
+    List<Homework> getStudentHomeworks(Integer studentId, Integer lessonId, Homework.HomeworkStatus status);
 } 

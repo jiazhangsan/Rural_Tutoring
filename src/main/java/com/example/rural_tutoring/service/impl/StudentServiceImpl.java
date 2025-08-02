@@ -62,4 +62,9 @@ public class StudentServiceImpl implements StudentService {
     public List<TutoringNeed> findNeedsByStudentId(Integer studentId) {
         return tutoringNeedMapper.findByStudentId(studentId);
     }
+
+    @Override
+    public Student getStudentByUserId(Integer userId) {
+        return studentMapper.getStudentByUserId(userId);
+    }
 }

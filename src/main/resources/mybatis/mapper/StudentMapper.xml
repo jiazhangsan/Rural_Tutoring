@@ -25,4 +25,9 @@
         SELECT id FROM student WHERE user_id = #{userId}
     </select>
 
+    <!-- 根据用户ID获取学生信息 -->
+    <select id="getStudentByUserId" resultType="com.example.rural_tutoring.entity.Student">
+        SELECT * FROM student WHERE user_id = #{userId}
+    </select>
+
 </mapper>

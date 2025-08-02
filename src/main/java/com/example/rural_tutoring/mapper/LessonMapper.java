@@ -47,4 +47,22 @@ public interface LessonMapper {
      * 获取课程下的所有学生
      */
     List<Student> getStudentsByLessonId(@Param("lessonId") Integer lessonId);
+
+    /**
+     * 根据条件筛选所有课程
+     * @param subjectId 科目ID（可选）
+     * @param lessonName 课程名称（对应notes字段，可选）
+     * @param gradeId 年级ID（可选）
+     * @return 课程列表
+     */
+    List<Lesson> getAllLessons(@Param("subjectId") Integer subjectId, 
+                               @Param("lessonName") String lessonName, 
+                               @Param("gradeId") Integer gradeId);
+
+    /**
+     * 查询学生加入的所有课程
+     * @param studentId 学生ID
+     * @return 课程列表
+     */
+    List<Lesson> getStudentJoinedLessons(@Param("studentId") Integer studentId);
 }

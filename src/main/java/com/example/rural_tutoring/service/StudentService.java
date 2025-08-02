@@ -25,4 +25,11 @@ public interface StudentService {
      * @return 需求列表
      */
     List<TutoringNeed> findNeedsByStudentId(Integer studentId);
+
+    /**
+     * 根据用户ID获取学生信息
+     * @param userId 用户ID
+     * @return 学生信息
+     */
+    Student getStudentByUserId(Integer userId);
 }

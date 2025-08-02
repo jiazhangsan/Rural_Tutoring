@@ -46,6 +46,7 @@ public class LessonServiceImpl implements LessonService {
             throw new IllegalStateException("当前用户不是教师");
         }
 
+
         // 保存课程
         int lessonResult = lessonMapper.insertLesson(lesson);
         if (lessonResult <= 0) {
@@ -184,5 +185,13 @@ public class LessonServiceImpl implements LessonService {
         return lessonMapper.getStudentsByLessonId(lessonId);
     }
 
+    @Override
+    public List<Lesson> getAllLessons(Integer subjectId, String lessonName, Integer gradeId) {
+        return lessonMapper.getAllLessons(subjectId, lessonName, gradeId);
+    }
 
+    @Override
+    public List<Lesson> getStudentJoinedLessons(Integer studentId) {
+        return lessonMapper.getStudentJoinedLessons(studentId);
+    }
 } 

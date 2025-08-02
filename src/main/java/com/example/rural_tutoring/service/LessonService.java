@@ -39,4 +39,20 @@ public interface LessonService {
      * @return 学生列表
      */
     List<Student> getStudents(Integer lessonId);
+
+    /**
+     * 根据条件筛选所有课程
+     * @param subjectId 科目ID（可选）
+     * @param lessonName 课程名称（对应notes字段，可选）
+     * @param gradeId 年级ID（可选）
+     * @return 课程列表
+     */
+    List<Lesson> getAllLessons(Integer subjectId, String lessonName, Integer gradeId);
+
+    /**
+     * 查询学生加入的所有课程
+     * @param studentId 学生ID
+     * @return 课程列表
+     */
+    List<Lesson> getStudentJoinedLessons(Integer studentId);
 }

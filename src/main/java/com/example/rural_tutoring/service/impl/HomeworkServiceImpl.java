@@ -142,4 +142,16 @@ public class HomeworkServiceImpl implements HomeworkService {
             throw new RuntimeException("图片上传失败: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public List<Homework> getHomeworksByCondition(Integer lessonId, Homework.HomeworkStatus status) {
+        String statusStr = status != null ? status.name() : null;
+        return homeworkMapper.getHomeworksByCondition(lessonId, statusStr);
+    }
+
+    @Override
+    public List<Homework> getStudentHomeworks(Integer studentId, Integer lessonId, Homework.HomeworkStatus status) {
+        String statusStr = status != null ? status.name() : null;
+        return homeworkMapper.getStudentHomeworks(studentId, lessonId, statusStr);
+    }
 } 

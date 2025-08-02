@@ -6,9 +6,11 @@
 
     <insert id="insertLesson" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO lesson (
-            date, start_time, end_time, fee, status, notes, location, max_students, actual_students
+            date, start_time, end_time, fee, status, notes, location, max_students, actual_students,
+            subject_id, grade_id, created_at, updated_at
         ) VALUES (
-            #{date}, #{startTime}, #{endTime}, #{fee}, #{status}, #{notes}, #{location}, #{maxStudents}, #{actualStudents}
+            #{date}, #{startTime}, #{endTime}, #{fee}, #{status}, #{notes}, #{location}, #{maxStudents}, #{actualStudents},
+            #{subjectId}, #{gradeId}, NOW(), NOW()
         )
     </insert>
 
@@ -56,7 +58,10 @@
             <if test="notes != null">notes = #{notes},</if>
             <if test="location != null">location = #{location},</if>
             <if test="maxStudents != null">max_students = #{maxStudents},</if>
-            <if test="actualStudents != null">actual_students = #{actualStudents}</if>
+            <if test="actualStudents != null">actual_students = #{actualStudents},</if>
+            <if test="subjectId != null">subject_id = #{subjectId},</if>
+            <if test="gradeId != null">grade_id = #{gradeId},</if>
+            updated_at = NOW()
         </set>
         WHERE id = #{id}
     </update>
@@ -67,6 +72,36 @@
         FROM student s
         INNER JOIN lesson_student ls ON s.id = ls.student_id
         WHERE ls.lesson_id = #{lessonId}
+    </select>
+
+    <!-- 根据条件筛选所有课程 -->
+    <select id="getAllLessons" resultType="com.example.rural_tutoring.entity.Lesson">
+        SELECT *
+        FROM lesson
+        <where>
+            <!-- 科目筛选 -->
+            <if test="subjectId != null">
+                AND subject_id = #{subjectId}
+            </if>
+            <!-- 课程名称筛选（对应notes字段） -->
+            <if test="lessonName != null and lessonName != ''">
+                AND notes LIKE CONCAT('%', #{lessonName}, '%')
+            </if>
+            <!-- 年级筛选 -->
+            <if test="gradeId != null">
+                AND grade_id = #{gradeId}
+            </if>
+        </where>
+        ORDER BY date DESC, start_time ASC
+    </select>
+
+    <!-- 查询学生加入的所有课程 -->
+    <select id="getStudentJoinedLessons" resultType="com.example.rural_tutoring.entity.Lesson">
+        SELECT l.*
+        FROM lesson l
+        INNER JOIN lesson_student ls ON l.id = ls.lesson_id
+        WHERE ls.student_id = #{studentId}
+        ORDER BY l.date DESC, l.start_time ASC
     </select>
 
 </mapper> 

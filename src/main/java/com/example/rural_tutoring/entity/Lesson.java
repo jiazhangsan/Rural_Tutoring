@@ -5,6 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -26,6 +27,14 @@ public class Lesson {
     private String location;      // 上课地点
     private Integer maxStudents;  // 最大容纳学生数
     private Integer actualStudents; // 实际参与学生数
+    private Integer subjectId;    // 科目ID
+    private Integer gradeId;      // 年级ID
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime createdAt;  // 创建时间
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime updatedAt;  // 更新时间
 
     /**
      * 课程名称：清晰、具体，能够准确反映课程内容。

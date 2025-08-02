@@ -26,4 +26,9 @@ public interface StudentMapper {
      * 根据用户ID获取学生ID
      */
     Integer getStudentIdByUserId(@Param("userId") Integer userId);
+
+    /**
+     * 根据用户ID获取学生信息
+     */
+    Student getStudentByUserId(@Param("userId") Integer userId);
 }

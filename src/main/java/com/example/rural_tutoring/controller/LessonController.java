@@ -8,6 +8,7 @@ import com.example.rural_tutoring.entity.Student;
 import com.example.rural_tutoring.model.VO.LessonVO;
 import com.example.rural_tutoring.service.FileService;
 import com.example.rural_tutoring.service.LessonService;
+import com.example.rural_tutoring.service.StudentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +35,8 @@ public class LessonController {
     private FileService fileService;
     @Autowired
     private ObjectMapper objectMapper;  // 注入配置好的 ObjectMapper
+    @Autowired
+    private StudentService studentService;
 
     @Operation(summary = "新增课程", description = "创建一个老师的新的课程，支持上传多张图片")
     @PostMapping("/addLesson")
@@ -97,9 +100,15 @@ public class LessonController {
         if (currentUserId == null) {
             return Result.error("用户ID不能为空");
         }
+        // 根据用户id查询学生表中的学生id
+        Student student = studentService.getStudentByUserId(currentUserId);
+        Integer studentId = student.getId();
+        if (student == null) {
+            return Result.error("学生不存在");
+        }
 
         try {
-            lessonService.joinLesson(lessonId, currentUserId);
+            lessonService.joinLesson(lessonId, studentId);
             return Result.success(null);
         } catch (RuntimeException e) {
             return Result.error(e.getMessage());
@@ -208,6 +217,36 @@ public class LessonController {
             return Result.error("上传失败: " + e.getMessage());
         }
     }
+
+    @Operation(summary = "根据条件筛选所有课程", description = "根据条件筛选所有课程")
+    @GetMapping("/getAllLessons")
+    public Result<List<Lesson>> getAllLessons(@RequestParam(required = false) Integer subjectId,
+                                              @RequestParam(required = false) String lessonName,
+                                              @RequestParam(required = false) Integer gradeId) {
+        List<Lesson> lessons = lessonService.getAllLessons(subjectId, lessonName, gradeId);
+        return Result.success(lessons);
+    }
+
+    @Operation(summary = "查询当前学生加入的所有课程", description = "查询当前登录学生加入的所有课程")
+    @GetMapping("/getMyJoinedLessons")
+    public Result<List<Lesson>> getMyJoinedLessons() {
+        // 获取当前登录用户ID
+        Integer currentUserId = UserContextInterceptor.getCurrentUserId();
+        if (currentUserId == null) {
+            return Result.error("未获取到用户信息，请重新登录");
+        }
+
+        // 根据用户ID获取学生信息
+        Student student = studentService.getStudentByUserId(currentUserId);
+        if (student == null) {
+            return Result.error("未找到对应的学生信息");
+        }
+
+        // 查询学生加入的所有课程
+        List<Lesson> lessons = lessonService.getStudentJoinedLessons(student.getId());
+        return Result.success(lessons);
+    }
+
 
     /**
      * 验证视频文件类型

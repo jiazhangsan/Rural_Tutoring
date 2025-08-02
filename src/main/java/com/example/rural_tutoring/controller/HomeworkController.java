@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.rural_tutoring.mapper.StudentMapper;
 
 @Tag(name = "作业管理", description = "作业相关的CRUD操作")
 @RestController
@@ -43,6 +44,9 @@ public class HomeworkController {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private StudentMapper studentMapper;
 
     @Operation(summary = "发布作业", description = "给指定课程发布作业，支持多个附件")
     @PostMapping("/{lessonId}")
@@ -210,10 +214,62 @@ public class HomeworkController {
      */
     private boolean isValidImageType(String filename) {
         if (filename == null) return false;
-        filename = filename.toLowerCase();
-        return filename.endsWith(".jpg") ||
-                filename.endsWith(".jpeg") ||
-                filename.endsWith(".png") ||
-                filename.endsWith(".gif");
+        String lowerCaseFilename = filename.toLowerCase();
+        return lowerCaseFilename.endsWith(".jpg") || 
+               lowerCaseFilename.endsWith(".jpeg") || 
+               lowerCaseFilename.endsWith(".png") || 
+               lowerCaseFilename.endsWith(".gif");
+    }
+
+    @Operation(summary = "根据条件查询作业", description = "根据课程ID和状态查询作业")
+    @GetMapping("/getHomeworks")
+    public Result<List<Homework>> getHomeworks(
+            @RequestParam(required = false) Integer lessonId,
+            @RequestParam(required = false) String status) {
+        
+        Homework.HomeworkStatus homeworkStatus = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                homeworkStatus = Homework.HomeworkStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return Result.error("无效的作业状态：" + status);
+            }
+        }
+        
+        List<Homework> homeworks = homeworkService.getHomeworksByCondition(lessonId, homeworkStatus);
+        return Result.success(homeworks);
+    }
+
+    @Operation(summary = "查询我的作业", description = "查询当前学生加入课程的所有作业")
+    @GetMapping("/getMyHomeworks")
+    public Result<List<Homework>> getMyHomeworks(
+            @RequestParam(required = false) Integer lessonId,
+            @RequestParam(required = false) String status) {
+        
+        // 获取当前登录用户ID
+        Integer currentUserId = UserContextInterceptor.getCurrentUserId();
+        if (currentUserId == null) {
+            return Result.error("未获取到用户信息，请重新登录");
+        }
+
+        // 根据用户ID获取学生信息
+        Integer studentId = studentMapper.getStudentIdByUserId(currentUserId);
+        if (studentId == null) {
+            return Result.error("未找到对应的学生信息");
+        }
+
+        // 解析作业状态
+        Homework.HomeworkStatus homeworkStatus = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                homeworkStatus = Homework.HomeworkStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return Result.error("无效的作业状态：" + status);
+            }
+        }
+
+        // 查询学生加入课程的所有作业
+        List<Homework> homeworks = homeworkService.getStudentHomeworks(studentId, lessonId, homeworkStatus);
+        return Result.success(homeworks);
     }
 }
